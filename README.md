@@ -23,25 +23,41 @@ ROLE=order PAYMENT_URL=http://localhost:8001 INVENTORY_URL=http://localhost:8002
 ```
 
 ## Kubernetes развёртывание
-1. Соберите образ и сделайте его доступным для кластера (пример для Minikube):
+
+### Кластер на Docker (kind)
+Если нужно поднимать Kubernetes прямо на Docker, используйте kind:
+1. Создайте кластер (проброс портов 80/443 описан в `kind-config.yaml`):
    ```bash
-   eval "$(minikube docker-env)"
-   docker build -t saga-demo:latest .
+   kind create cluster --name saga --config kind-config.yaml
    ```
-2. Создайте namespace и установите манифесты:
+2. Соберите образ и загрузите его в кластер kind:
+   ```bash
+   docker build -t saga-demo:latest .
+   kind load docker-image saga-demo:latest --name saga
+   ```
+3. Установите ingress-nginx для kind:
+   ```bash
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+   kubectl wait --namespace ingress-nginx --for=condition=available deployment/ingress-nginx-controller
+   ```
+4. Примените манифесты приложения:
    ```bash
    kubectl apply -f k8s/namespace.yaml
    kubectl apply -f k8s/deployments.yaml
    kubectl apply -f k8s/services.yaml
    kubectl apply -f k8s/ingress.yaml
    ```
-3. Ingress использует домен `arch.homework`. Добавьте запись в `/etc/hosts`, указывая на адрес ingress-контроллера (для Minikube: `minikube ip`).
-4. Проверка:
+5. Пропишите `arch.homework` на localhost (Ingress проброшен на 80/443):
+   ```bash
+   echo "127.0.0.1 arch.homework" | sudo tee -a /etc/hosts
+   ```
+6. Проверка:
    ```bash
    curl http://arch.homework/health
    curl -X POST http://arch.homework/orders -H "Content-Type: application/json" \
      -d '{"order_id":"demo-1","amount":10,"sku":"SKU-1","quantity":1,"slot":"2024-05-20T10:00"}'
    ```
+
 
 ## Postman тесты
 Коллекция `postman/DistributedTransactions.postman_collection.json` содержит сценарии:
