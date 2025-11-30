@@ -1,0 +1,39 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# ===== Virtual Environments =====
+venv/
+.env/
+.env*/
+.venv/
+.venv*/
+ENV/
+env/
+env*/
+pip-wheel-metadata/
+
+# ===== IDE / Editor =====
+.vscode/
+.idea/
+*.swp
+
+# ===== macOS =====
+.DS_Store
+
+# ===== Docker =====
+*.pid
+docker-compose.override.yml
+
+# ===== Tarantool =====
+*.snap
+*.xlog
+var/
