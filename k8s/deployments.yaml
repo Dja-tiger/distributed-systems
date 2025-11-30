@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: distributed-transactions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+        - name: payment
+          image: saga-demo:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ROLE
+              value: payment
+          ports:
+            - containerPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  namespace: distributed-transactions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      containers:
+        - name: inventory
+          image: saga-demo:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ROLE
+              value: inventory
+          ports:
+            - containerPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-service
+  namespace: distributed-transactions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery
+  template:
+    metadata:
+      labels:
+        app: delivery
+    spec:
+      containers:
+        - name: delivery
+          image: saga-demo:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ROLE
+              value: delivery
+          ports:
+            - containerPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: distributed-transactions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - name: order
+          image: saga-demo:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ROLE
+              value: order
+            - name: PAYMENT_URL
+              value: http://payment-service:8000
+            - name: INVENTORY_URL
+              value: http://inventory-service:8000
+            - name: DELIVERY_URL
+              value: http://delivery-service:8000
+          ports:
+            - containerPort: 8000
