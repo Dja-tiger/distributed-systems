@@ -24,6 +24,7 @@ ROLE=order PAYMENT_URL=http://localhost:8001 INVENTORY_URL=http://localhost:8002
 
 ## Kubernetes развёртывание
 
+
 ### Кластер на Docker (k3d)
 Если нужен Kubernetes прямо в Docker, используйте k3d (k3s в контейнерах Docker):
 1. Создайте кластер (проброс портов 80/443 описан в `k3d-config.yaml`):
@@ -36,22 +37,26 @@ ROLE=order PAYMENT_URL=http://localhost:8001 INVENTORY_URL=http://localhost:8002
    k3d image import saga-demo:latest --cluster saga
    ```
 3. Traefik ставится вместе с k3s в k3d, поэтому дополнительные действия для ingress не нужны. Примените манифесты приложения:
+
    ```bash
    kubectl apply -f k8s/namespace.yaml
    kubectl apply -f k8s/deployments.yaml
    kubectl apply -f k8s/services.yaml
    kubectl apply -f k8s/ingress.yaml
    ```
+
 4. Пропишите `arch.homework` на localhost (Ingress проброшен на 80/443 через k3d load balancer):
    ```bash
    echo "127.0.0.1 arch.homework" | sudo tee -a /etc/hosts
    ```
 5. Проверка:
+
    ```bash
    curl http://arch.homework/health
    curl -X POST http://arch.homework/orders -H "Content-Type: application/json" \
      -d '{"order_id":"demo-1","amount":10,"sku":"SKU-1","quantity":1,"slot":"2024-05-20T10:00"}'
    ```
+
 
 ### Minikube (альтернативно)
 1. Соберите образ и сделайте его доступным для кластера:
@@ -73,6 +78,7 @@ ROLE=order PAYMENT_URL=http://localhost:8001 INVENTORY_URL=http://localhost:8002
    curl -X POST http://arch.homework/orders -H "Content-Type: application/json" \
      -d '{"order_id":"demo-1","amount":10,"sku":"SKU-1","quantity":1,"slot":"2024-05-20T10:00"}'
    ```
+
 
 ## Postman тесты
 Коллекция `postman/DistributedTransactions.postman_collection.json` содержит сценарии:
