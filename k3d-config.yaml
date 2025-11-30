@@ -5,7 +5,10 @@ metadata:
   name: saga
 servers: 1
 agents: 1
-# Expose HTTP/HTTPS for the arch.homework ingress via the k3d load balancer
 ports:
-  - port: 80:80@loadbalancer
-  - port: 443:443@loadbalancer
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
